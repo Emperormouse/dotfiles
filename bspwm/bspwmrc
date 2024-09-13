@@ -1,0 +1,32 @@
+#!/bin/bash
+
+bspc rule -r "*"
+
+pgrep -x sxhkd > /dev/null || sxhkd &
+#commands
+xinput set-prop 11 373 1837, 0, 0, 0, 0, 0, 0, 0
+brightnessctl -d "intel_backlight" set 20%
+
+pipewire &
+nitrogen --restore &
+picom &
+polybar bar1 &
+polybar bar2 &
+nm-applet &
+blueman-applet &
+/home/malcolm/scripts/low_power_notify.sh &
+
+bspc monitor -d I II III IV V VI 
+
+bspc config focus_follows_pointer true
+
+bspc config border_width         2
+bspc config window_gap           5
+bspc config focused_border_color "#2650FF"
+
+bspc config split_ratio          0.52
+bspc config borderless_monocle   true
+bspc config gapless_monocle      true
+
+#RULES
+bspc rule -a Blueman-manager state=floating rectangle=640x480+1200+80
