@@ -2,7 +2,8 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+
+{ config, pkgs, lib, ... }:
 
 {
   imports =
@@ -15,19 +16,19 @@
   # Bootloader.
   boot = {
     loader = {
-      systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
       timeout = 0;
+      systemd-boot.enable = true;
+      #grub = {
+      #  enable = true;
+      #  efiSupport = true;
+      #  #efiInstallAsRemovable = true;
+      #  device = "nodev";
+      #  useOSProber = true;
+      #};
     };
     initrd.systemd.enable = true;
-    #plymouth = {
-    #  enable = true;
-    #  theme = "breeze";
-    #};
-    kernelParams = [
-      "quiet"
-      "splash"
-    ];
+    kernelParams = [ "quiet" "splash" ];
   };
 
   networking.hostName = "nixos"; # Define your hostname.
@@ -62,7 +63,8 @@
   services.xserver.enable = true;
 
   services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.desktopManager.budgie.enable = true;
+  #services.xserver.desktopManager.budgie.enable = true;
+  services.xserver.windowManager.bspwm.enable = true;
 
   #services.displayManager.cosmic-greeter.enable = true;
   #services.desktopManager.cosmic.enable = true;
@@ -94,11 +96,13 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
+  virtualisation.docker.enable = true;
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.malcolm = {
     isNormalUser = true;
     description = "Malcolm";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.zsh;
     packages = with pkgs; [
     #  thunderbird
@@ -110,12 +114,35 @@
   programs.steam.enable = true;
   programs.zsh.enable = true;
 
+  virtualisation.vmware.host.enable = true;
+  services.upower.enable = true;
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    #bspwm
+    bspwm
+    picom
+    sxhkd
+    nitrogen
+    polybar
+    networkmanagerapplet
+    brightnessctl
+
+    #budgie
+    budgie.magpie
+    budgie.budgie-session
+    budgie.budgie-screensaver
+    budgie.budgie-gsettings-overrides
+    budgie.budgie-desktop-with-plugins
+    budgie.budgie-desktop-view
+    budgie.budgie-desktop
+    budgie.budgie-control-center
+    budgie.budgie-backgrounds
+
     git
     neovim
     alacritty
@@ -132,15 +159,36 @@
     superTuxKart
     superTux
     zsh
-    (python3.withPackages(ps: with ps; [ requests]))
+    (python3.withPackages(ps: with ps; [ requests ]))
     github-desktop
     chromium
-    quick-webapps
     android-studio
     cowsay
     ccrypt
     plymouth
-];
+    nettools
+    gparted
+    signal-desktop
+    unzip
+    tmux
+    kitty
+    file
+    patchelf
+    cmake
+    btop
+    mesa
+    dmenu
+    os-prober
+    bat
+    distrobox
+    xclip
+    alsa-utils
+    upower
+    blueman
+    rofi
+    killall
+    pulseaudio
+  ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -149,6 +197,16 @@
   #   enable = true;
   #   enableSSHSupport = true;
   # };
+
+  systemd.services.ssh-tunnel = {
+    enable = true;
+    description = "ssh socks5 tunnel";
+    serviceConfig = {
+      User = "malcolm";
+      ExecStart = "${pkgs.bash}/bin/bash -c 'while true; do ${pkgs.openssh}/bin/ssh -p1495 -ND 9999 malcolm@24.28.1.246; sleep 10; done'";
+    };
+    wantedBy = [ "multi-user.target" ]; # starts after login
+  };
 
   # List services that you want to enable:
 
