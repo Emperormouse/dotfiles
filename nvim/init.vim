@@ -23,13 +23,14 @@ Plug 'navarasu/onedark.nvim'
 Plug 'Mofiqul/dracula.nvim'
 Plug 'ellisonleao/gruvbox.nvim'
 
+Plug 'neoclide/coc.nvim'
 Plug 'nvim-lualine/lualine.nvim'
 Plug 'nvim-tree/nvim-web-devicons'
-Plug 'neoclide/coc.nvim'
 Plug 'preservim/nerdtree'
 
 call plug#end()
 
+nnoremap    <C
 nnoremap    <C-c>   0i#<esc>j
 nnoremap    <C-x>   0xj
 nnoremap    C       J
@@ -51,8 +52,3 @@ inoremap <silent><expr> <cr> "\<c-g>u\<CR>"
 
 colorscheme kanagawa
 highlight Normal guibg=none
-
-lua << END
-require('lualine').setup()
-END
-

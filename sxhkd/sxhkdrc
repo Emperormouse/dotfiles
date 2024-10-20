@@ -3,30 +3,30 @@
 #
 # terminal emulator
 super + Return
-	alacritty
+	kitty
 
 super + n
-    alacritty -e nvim
+    kitty -e nvim
 
 super + shift + h
-    alacritty -e htop
+    kitty -e htop
 
 # Browser
 super + b
-    firefox -p Home
+    librewolf -p Home
 
 super + shift + b
-    firefox -p School
+    librewolf -p School
 
-# dmenu
+# rofi
+super + d
+	rofi -show run
+
 super + p
-	dmenu_run
-
-super + y
-    freetube
+    dmenu_run
 
 super + c
-    bspc rule -a Alacritty state=floating rectangle=640x400+1200+80 -o && alacritty -e tmux new-session /bin/bash 
+    bspc rule -a Kitty state=floating rectangle=640x400+1200+80 -o && kitty tmux new-session /usr/bin/env bash
     
 super + shift + s
     xfce4-screenshooter
@@ -36,11 +36,11 @@ super + shift + p
 
 #Volume Control
 XF86AudioLowerVolume
-	pamixer -d 5 && printf $(/home/malcolm/notify-send.sh -t 1000 -p -r $(cat /tmp/nid) $(pamixer --get-volume-human)) > /tmp/nid
+    ~/scripts/volume-change.sh - 5 && pactl set-sink-mute @DEFAULT_SINK@ false 
 XF86AudioRaiseVolume
-	pamixer -i 5 && printf $(notify-send -t 1000 -p -r $(cat /tmp/nid) $(pamixer --get-volume-human)) > /tmp/nid
+    ~/scripts/volume-change.sh + 5 && pactl set-sink-mute @DEFAULT_SINK@ false 
 XF86AudioMute
-    pamixer -t && printf $(notify-send -t 1000 -p -r $(cat /tmp/nid) $(pamixer --get-volume-human)) > /tmp/nid
+    pactl set-sink-mute @DEFAULT_SINK@ toggle && pactl get-sink-mute @DEFAULT_SINK@ | grep yes && echo "MUT" >> /tmp/volume || echo $(pactl get-sink-volume @DEFAULT_SINK@ | grep "Volume" | cut -d'/' -f2 | tr -d ' ') >> /tmp/volume
 
 XF86MonBrightness{Up,Down}  
 	brightnessctl -d "intel_backlight" set {5%+, 5%-}
@@ -53,13 +53,13 @@ super + shift + c
 # bspwm hotkeys
 #
 
-# logout/restart bspwm
-super + shift + {q,r}
-	bspc {quit,wm -r}
-
 # shutdown/restart
-super + {q, r}
+super + shift + {q,r}
 	{poweroff, reboot}
+
+# logout/restart bspwm
+super + {q, r}
+	bspc {quit,wm -r}
 
 # close and kill
 super + {x, d}
