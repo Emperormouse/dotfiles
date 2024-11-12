@@ -9,26 +9,29 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./packages.nix
     ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes"];
 
   # Bootloader.
   boot = {
-    loader = {
-      efi.canTouchEfiVariables = true;
-      timeout = 0;
-      systemd-boot.enable = true;
-      #grub = {
-      #  enable = true;
-      #  efiSupport = true;
-      #  #efiInstallAsRemovable = true;
-      #  device = "nodev";
-      #  useOSProber = true;
-      #};
-    };
     initrd.systemd.enable = true;
     kernelParams = [ "quiet" "splash" ];
+    loader = {
+      efi.canTouchEfiVariables = true;
+      timeout = 1;
+      #systemd-boot.enable = true;
+      grub = {
+        enable = true;
+        efiSupport = true;
+        #efiInstallAsRemovable = true;
+        device = "nodev";
+        useOSProber = true;
+        timeoutStyle = "hidden";
+        splashImage = ./nix-logo.jpg;
+      };
+    };
   };
 
   networking.hostName = "nixos"; # Define your hostname.
@@ -59,12 +62,29 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  # Configure the X11 windowing system.
+  services.xserver = {
+    enable = true;
+    windowManager.bspwm.enable = true;
+    #desktopManager.budgie.enable = true;
 
-  services.xserver.displayManager.lightdm.enable = true;
-  #services.xserver.desktopManager.budgie.enable = true;
-  services.xserver.windowManager.bspwm.enable = true;
+    displayManager.lightdm = {
+      enable = true;
+      greeters.gtk = {
+        theme.name = "Adwaita-dark";
+        iconTheme.name = "Qogir-Dark";
+      };
+    };
+  };
+
+  /*
+  programs.hyprland.enable = true;
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
+  */
+
 
   #services.displayManager.cosmic-greeter.enable = true;
   #services.desktopManager.cosmic.enable = true;
@@ -96,99 +116,44 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  virtualisation.docker.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.malcolm = {
-    isNormalUser = true;
-    description = "Malcolm";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
-    shell = pkgs.zsh;
-    packages = with pkgs; [
-    #  thunderbird
-    ];
+  users = {
+    extraGroups.vboxusers.members = [ "malcolm" ];
+    users.malcolm = {
+      isNormalUser = true;
+      description = "Malcolm";
+      extraGroups = [ "networkmanager" "wheel" "docker" ];
+      shell = pkgs.zsh;
+      packages = with pkgs; [
+      #  thunderbird
+      ];
+    };
+  };
+
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
   };
 
   # Install firefox.
-  programs.firefox.enable = true;
-  programs.steam.enable = true;
-  programs.zsh.enable = true;
+  programs = {
+    firefox.enable = true;
+    steam.enable = true;
+    zsh.enable = true;
+  };
 
-  virtualisation.vmware.host.enable = true;
+  virtualisation = {
+    vmware.host.enable = true;
+    virtualbox.host.enable = true;
+    docker.enable = true;
+  };
+
   services.upower.enable = true;
+  services.blueman.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    #bspwm
-    bspwm
-    picom
-    sxhkd
-    nitrogen
-    polybar
-    networkmanagerapplet
-    brightnessctl
-
-    #budgie
-    budgie.magpie
-    budgie.budgie-session
-    budgie.budgie-screensaver
-    budgie.budgie-gsettings-overrides
-    budgie.budgie-desktop-with-plugins
-    budgie.budgie-desktop-view
-    budgie.budgie-desktop
-    budgie.budgie-control-center
-    budgie.budgie-backgrounds
-
-    git
-    neovim
-    alacritty
-    htop
-    neofetch
-    nodejs_22
-    cmatrix
-    virtualbox
-    discord
-    vscodium
-    flatpak
-    gimp
-    lutris
-    superTuxKart
-    superTux
-    zsh
-    (python3.withPackages(ps: with ps; [ requests ]))
-    github-desktop
-    chromium
-    android-studio
-    cowsay
-    ccrypt
-    plymouth
-    nettools
-    gparted
-    signal-desktop
-    unzip
-    tmux
-    kitty
-    file
-    patchelf
-    cmake
-    btop
-    mesa
-    dmenu
-    os-prober
-    bat
-    distrobox
-    xclip
-    alsa-utils
-    upower
-    blueman
-    rofi
-    killall
-    pulseaudio
-  ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -203,7 +168,13 @@
     description = "ssh socks5 tunnel";
     serviceConfig = {
       User = "malcolm";
-      ExecStart = "${pkgs.bash}/bin/bash -c 'while true; do ${pkgs.openssh}/bin/ssh -p1495 -ND 9999 malcolm@24.28.1.246; sleep 10; done'";
+      ExecStart = ''
+        $!${pkgs.bash}/bin/bash
+        while true; do 
+            ${pkgs.openssh}/bin/ssh -p1495 -ND 9999 malcolm@24.28.1.246; 
+            sleep 10; 
+        done
+      '';
     };
     wantedBy = [ "multi-user.target" ]; # starts after login
   };
