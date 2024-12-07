@@ -5,34 +5,24 @@
 super + Return
 	kitty
 
-super + n
-    kitty -e nvim
-
-super + shift + h
-    kitty -e htop
-
 # Browser
 super + b
     librewolf -p Home
 
 super + shift + b
-    librewolf -p School
+    firefox -p School
 
-# rofi
-super + d
-	rofi -show run
+super + shift + h
+    kitty -e htop
 
-super + p
-    dmenu_run
-
-super + c
-    bspc rule -a Kitty state=floating rectangle=640x400+1200+80 -o && kitty tmux new-session /usr/bin/env bash
-    
 super + shift + s
     xfce4-screenshooter
 
-super + shift + p
-    socks_proxy.sh
+super + d
+    dmenu_run -sb "#8ABEB7" -sf "#000000"
+
+super + n
+    nmcli connection up $(nmcli connection show | grep wifi | cut -d' ' -f1 | dmenu -sb "#8ABEB7" -sf "#000000" -nb "#1e1e28" -nf "#bbbbbb")
 
 #Volume Control
 XF86AudioLowerVolume

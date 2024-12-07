@@ -12,8 +12,9 @@ picom &
 nm-applet &
 blueman-applet &
 /home/malcolm/scripts/low_power_notify.sh &
-/home/malcolm/scripts/volume-change.sh - 100
-echo 0 > /tmp/volume
+echo "0" > /tmp/volume
+chmod 666 /tmp/volume
+pactl set-sink-volume @DEFAULT_SINK@ 0
 
 if grep "^NAME=" /etc/os-release | grep "NixOS"; then
     polybar bar2 &
@@ -32,3 +33,4 @@ bspc config gapless_monocle      true
 
 #RULES
 bspc rule -a Blueman-manager state=floating rectangle=640x480+1200+80
+
