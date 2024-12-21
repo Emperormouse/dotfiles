@@ -9,6 +9,7 @@
     blueman
     sxhkd
     polybar
+    dunst
 
     git
     neovim
@@ -46,6 +47,19 @@
     bat
     upower
     brightnessctl
+    networkmanagerapplet
+    pulseaudio
+    dmenu
+    librewolf-bin
+    networkmanager_dmenu
+    xorg.xev
+    xclip
+    meld
+    xfce.xfce4-screenshooter
+    plymouth
+    wget
+    qogir-theme
+    qogir-icon-theme
   ];
 }
 

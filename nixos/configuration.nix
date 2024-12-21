@@ -2,7 +2,9 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-
+let 
+  themeColor = "#7aa2f7";
+in
 { config, pkgs, lib, ... }:
 
 {
@@ -21,10 +23,12 @@
     kernelParams = [ "quiet" "splash" ];
     loader = {
       systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+      timeout = 0;
     };
   };
 
-  system.copySystemConfiguration
+  system.copySystemConfiguration = true;
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -42,26 +46,29 @@
 
     xserver = {
       enable = true;
+      windowManager.bspwm.enable = true;
       xkb.options = "caps:escape";
       displayManager = {
-        #defaultSession = "none+xmonad";
+        defaultSession = "none+bspwm";
         lightdm = {
           enable = true;
+          greeters.mini = {
+            enable = true;
+            user = "malcolm";
+            extraConfig = ''
+                [greeter-theme]
+                background-image = "/etc/nixos/data/login-background.jpg"
+                window-color = "${themeColor}"
+            '';
+          };
+          /*
 	      greeters.slick = {
 	        enable = true;
-	        extraConfig = ''
-              background = ./night.jpg;
-	        '';
-	      };
+            draw-user-backgrounds = true;
+	        extraConfig = "background=/etc/nixos/data/login-background.jpg";
+	      };*/
         };
       };
-      windowManager.bspwm.enable = true;
-      /*
-      windowManager.xmonad = {
-        enable = true;
-	    enableContribAndExtras = true;
-      };
-      */
     };
   };
 
@@ -88,7 +95,7 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.sessionVariables = rec {
-    THEME_COLOR = "#7aa2f7";
+    THEME_COLOR = themeColor;
     EDITOR = "nvim";
     XDG_CONFIG_HOME = "$HOME" + "/.config";
   };

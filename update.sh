@@ -8,6 +8,7 @@ for config in $(ls | grep -v "^update.sh$" | grep -v "^nixos$" | grep -v "^scrip
 done
 
 cp -r ~/scripts .
+cp -r /etc/nixos .
 
 git add .
 git commit . -m "Updated"
