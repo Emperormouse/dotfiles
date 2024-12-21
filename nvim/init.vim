@@ -50,5 +50,5 @@ nmap    <S-K>   <PageUp>
 inoremap <silent><expr> <tab> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<TAB>"
 inoremap <silent><expr> <cr> "\<c-g>u\<CR>"
 
-colorscheme kanagawa
+colorscheme tokyonight
 highlight Normal guibg=none

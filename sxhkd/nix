@@ -19,13 +19,11 @@ super + shift + s
     xfce4-screenshooter
 
 super + d
-    dmenu_run -sb "$THEME_COLOR" -sf "#000000"
+    #dmenu_run -sb "#8ABEB7" -sf "#000000"
+    rofi -show run
 
 super + n
-    networkmanager_dmenu -l 8 -sb "$THEME_COLOR" -sf "#000000"
-
-super + slash
-    ~/scripts/menu.sh
+    nmcli connection up $(nmcli connection show | grep wifi | cut -d' ' -f1 | dmenu -sb "#8ABEB7" -sf "#000000" -nb "#1e1e28" -nf "#bbbbbb")
 
 #Volume Control
 XF86AudioLowerVolume

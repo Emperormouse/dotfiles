@@ -7,10 +7,11 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./packages.nix
-    ];
+  [ # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ./packages.nix
+  ];
+
 
   nix.settings.experimental-features = [ "nix-command" "flakes"];
 
@@ -19,162 +20,85 @@
     initrd.systemd.enable = true;
     kernelParams = [ "quiet" "splash" ];
     loader = {
-      efi.canTouchEfiVariables = true;
-      timeout = 1;
-      #systemd-boot.enable = true;
-      grub = {
-        enable = true;
-        efiSupport = true;
-        #efiInstallAsRemovable = true;
-        device = "nodev";
-        useOSProber = true;
-        timeoutStyle = "hidden";
-        splashImage = ./nix-logo.jpg;
-      };
+      systemd-boot.enable = true;
     };
   };
 
-  networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
+  system.copySystemConfiguration
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+
+  hardware.bluetooth.enable = true; # enables support for Bluetooth
+  hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
 
   # Enable networking
   networking.networkmanager.enable = true;
 
   # Set your time zone.
-  time.timeZone = "America/Chicago";
+  services = {
+    upower.enable = true;
+    blueman.enable = true;
 
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
-  # Configure the X11 windowing system.
-  services.xserver = {
-    enable = true;
-    windowManager.bspwm.enable = true;
-    #desktopManager.budgie.enable = true;
-
-    displayManager.lightdm = {
+    xserver = {
       enable = true;
-      greeters.gtk = {
-        theme.name = "Adwaita-dark";
-        iconTheme.name = "Qogir-Dark";
+      xkb.options = "caps:escape";
+      displayManager = {
+        #defaultSession = "none+xmonad";
+        lightdm = {
+          enable = true;
+	      greeters.slick = {
+	        enable = true;
+	        extraConfig = ''
+              background = ./night.jpg;
+	        '';
+	      };
+        };
       };
+      windowManager.bspwm.enable = true;
+      /*
+      windowManager.xmonad = {
+        enable = true;
+	    enableContribAndExtras = true;
+      };
+      */
     };
   };
 
-  /*
-  programs.hyprland.enable = true;
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-  };
-  */
+  #services.xserver.desktopManager.budgie.enable = true;
 
-
-  #services.displayManager.cosmic-greeter.enable = true;
-  #services.desktopManager.cosmic.enable = true;
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
-  };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users = {
-    extraGroups.vboxusers.members = [ "malcolm" ];
-    users.malcolm = {
-      isNormalUser = true;
-      description = "Malcolm";
-      extraGroups = [ "networkmanager" "wheel" "docker" ];
-      shell = pkgs.zsh;
-      packages = with pkgs; [
-      #  thunderbird
-      ];
-    };
-  };
-
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
+  users.users.malcolm = {
+    isNormalUser = true;
+    description = "Malcolm";
+    extraGroups = [ "networkmanager" "wheel" "plugdev" ];
+    shell = pkgs.zsh;
+    packages = with pkgs; [
+    #  thunderbird
+    ];
   };
 
   # Install firefox.
-  programs = {
-    firefox.enable = true;
-    steam.enable = true;
-    zsh.enable = true;
-  };
+  programs.firefox.enable = true;
+  programs.steam.enable = true;
+  programs.zsh.enable = true;
 
-  virtualisation = {
-    vmware.host.enable = true;
-    virtualbox.host.enable = true;
-    docker.enable = true;
-  };
-
-  services.upower.enable = true;
-  services.blueman.enable = true;
+  virtualisation.vmware.host.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  environment.sessionVariables = rec {
+    THEME_COLOR = "#7aa2f7";
+    EDITOR = "nvim";
+    XDG_CONFIG_HOME = "$HOME" + "/.config";
+  };
 
   systemd.services.ssh-tunnel = {
     enable = true;
     description = "ssh socks5 tunnel";
     serviceConfig = {
       User = "malcolm";
-      ExecStart = ''
-        $!${pkgs.bash}/bin/bash
-        while true; do 
-            ${pkgs.openssh}/bin/ssh -p1495 -ND 9999 malcolm@24.28.1.246; 
-            sleep 10; 
-        done
-      '';
+      ExecStart = "${pkgs.bash}/bin/bash -c 'while true; do ${pkgs.openssh}/bin/ssh -p1495 -ND 9999 malcolm@24.28.1.246; sleep 10; done'";
     };
     wantedBy = [ "multi-user.target" ]; # starts after login
   };
@@ -196,6 +120,6 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.05"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
 
 }
