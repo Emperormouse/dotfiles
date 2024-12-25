@@ -3,7 +3,8 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 let 
-  themeColor = "#7aa2f7";
+  themeFG = "#7aa2f7";
+  themeBG = "#1a1b26";
 in
 { config, pkgs, lib, ... }:
 
@@ -58,7 +59,7 @@ in
             extraConfig = ''
                 [greeter-theme]
                 background-image = "/etc/nixos/data/login-background.jpg"
-                window-color = "${themeColor}"
+                window-color = "${themeFG}"
             '';
           };
           /*
@@ -95,7 +96,8 @@ in
   nixpkgs.config.allowUnfree = true;
 
   environment.sessionVariables = rec {
-    THEME_COLOR = themeColor;
+    THEME_COLOR = themeFG;
+    THEME_BG = themeBG;
     EDITOR = "nvim";
     XDG_CONFIG_HOME = "$HOME" + "/.config";
   };

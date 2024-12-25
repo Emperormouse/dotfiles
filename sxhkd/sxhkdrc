@@ -19,10 +19,11 @@ super + shift + s
     xfce4-screenshooter
 
 super + d
-    dmenu_run -sb "$THEME_COLOR" -sf "#000000"
+    ~/scripts/dmenu_run -sb "$THEME_COLOR" -sf "#000000" -nb "$THEME_BG"
+
 
 super + n
-    networkmanager_dmenu -l 8 -sb "$THEME_COLOR" -sf "#000000"
+    networkmanager_dmenu -l 8 -sb "$THEME_COLOR" -sf "#000000" -nb "$THEME_BG"
 
 super + slash
     ~/scripts/menu.sh

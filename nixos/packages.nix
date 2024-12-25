@@ -1,5 +1,8 @@
 { config, pkgs, ... }:
 
+let
+  dmenu = import ./dmenu.nix { inherit pkgs; };
+in
 {
   environment.systemPackages = with pkgs; [
     bspwm
@@ -12,6 +15,7 @@
     dunst
 
     git
+    dmenu
     neovim
     alacritty
     htop
@@ -49,7 +53,6 @@
     brightnessctl
     networkmanagerapplet
     pulseaudio
-    dmenu
     librewolf-bin
     networkmanager_dmenu
     xorg.xev
@@ -60,6 +63,7 @@
     wget
     qogir-theme
     qogir-icon-theme
+    feh
   ];
 }
 

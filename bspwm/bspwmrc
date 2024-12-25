@@ -7,7 +7,7 @@ xinput set-prop 11 373 1837, 0, 0, 0, 0, 0, 0, 0
 brightnessctl -d "intel_backlight" set 20%
 
 pipewire &
-nitrogen --restore &
+feh --bg-fill /etc/nixos/data/main-background.jpg
 #nm-applet &
 #blueman-applet &
 /home/malcolm/scripts/low_power_notify.sh &
