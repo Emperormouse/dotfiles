@@ -5,6 +5,10 @@ let
 in
 {
   environment.systemPackages = with pkgs; [
+    #custom Packages
+    dmenu
+
+    #bspwm
     bspwm
     pipewire
     nitrogen
@@ -14,8 +18,8 @@ in
     polybar
     dunst
 
+    #other
     git
-    dmenu
     neovim
     alacritty
     htop
@@ -31,7 +35,8 @@ in
     superTuxKart
     superTux
     zsh
-    (python3.withPackages(ps: with ps; [ requests]))
+    (python3.withPackages(ps: with ps; [requests]))
+    pyright
     github-desktop
     chromium
     cowsay
@@ -64,6 +69,12 @@ in
     qogir-theme
     qogir-icon-theme
     feh
+    rustc
+    rust-analyzer-unwrapped
+    cargo
+    retroarch
+    gcc
+    tree
   ];
 }
 
