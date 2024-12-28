@@ -2,7 +2,6 @@ return {
   "folke/tokyonight.nvim",
   "neovim/nvim-lspconfig",
   "nvim-lualine/lualine.nvim",
-  "nvim-tree/nvim-web-devicons",
   "preservim/nerdtree",
   "hrsh7th/cmp-nvim-lsp",
   "hrsh7th/cmp-buffer",

@@ -12,7 +12,7 @@ in
   imports =
   [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./packages.nix
+    ./packages/packages.nix
   ];
 
 
@@ -34,8 +34,11 @@ in
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  hardware.bluetooth.enable = true; # enables support for Bluetooth
-  hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
+  hardware.bluetooth = {
+    enable = true; # enables support for Bluetooth
+    package = pkgs.bluez-experimental;
+    powerOnBoot = true; # powers up the default Bluetooth controller on boot
+  };
 
   # Enable networking
   networking.networkmanager.enable = true;
@@ -47,10 +50,10 @@ in
 
     xserver = {
       enable = true;
-      windowManager.bspwm.enable = true;
+      windowManager.qtile.enable = true;
       xkb.options = "caps:escape";
       displayManager = {
-        defaultSession = "none+bspwm";
+        defaultSession = "qtile";
         lightdm = {
           enable = true;
           greeters.mini = {
