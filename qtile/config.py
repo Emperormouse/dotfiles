@@ -32,27 +32,6 @@ from libqtile import hook
 import os
 import subprocess
 
-mod = "mod4"
-terminal = "alacritty"
-browser = "librewolf"
-
-theme_color = os.environ.get("THEME_COLOR", "#ff0000")
-theme_bg = os.environ.get("THEME_BG", "#000000")
-theme_fg = "#c0caf5"
-
-dmenu_flags = f'-sb "{theme_color}" -sf "#000000" -nb "{theme_bg}"'
-
-scripts = os.environ.get("HOME", "/") + "/scripts"
-
-@hook.subscribe.startup
-def autostart():
-    script = """
-        feh --bg-fill /etc/nixos/data/main-background.jpg
-    """.splitlines()[1:]
-
-    for cmd in script :
-        subprocess.Popen(cmd.strip().split(' '))
-
 def icon(icon: str):
     return widget.TextBox(
             text=icon, 
@@ -67,12 +46,36 @@ def seperator():
             fontsize=17,
     )
 
+mod = "mod4"
+terminal = "alacritty"
+browser = "librewolf"
+
+theme_color = os.environ.get("THEME_COLOR", "#ff0000")
+theme_bg = os.environ.get("THEME_BG", "#000000")
+theme_fg = "#c0caf5"
+
+
+scripts = os.environ.get("HOME", "") + "/scripts"
+
+@hook.subscribe.startup
+def autostart():
+    script = """
+        feh --bg-fill /etc/nixos/data/main-background.jpg
+    """.splitlines()[1:]
+
+    for cmd in script :
+        subprocess.Popen(cmd.strip().split(' '))
+
+
+dmenu_flags = f'-sb "{theme_color}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}"'
 
 keys = [
     #My Keys
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
     Key([mod], "b", lazy.spawn(f"{browser} -p Home"), desc="Launch browser"),
+    Key([mod, "shift"], "b", lazy.spawn("firefox -p School"), desc="Launch school browser"),
     Key([mod], "d", lazy.spawn(f"dmenu_run {dmenu_flags}"), desc="Launch dmenu"),
+
     Key([], "XF86AudioLowerVolume", lazy.spawn(f"{scripts}/volume-change.sh - 5 && pactl set-sink-mute @DEFAULT_SINK@ false"), desc="Vol up"),
     Key([], "XF86AudioRaiseVolume", lazy.spawn(f"{scripts}/volume-change.sh + 5 && pactl set-sink-mute @DEFAULT_SINK@ false"), desc="Vol up"),
     Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl -d 'intel_backlight' set 5%+"), desc="Vol up"),
@@ -120,7 +123,7 @@ keys = [
     ),
     Key([mod], "s", lazy.window.toggle_floating(), desc="Toggle floating on the focused window"),
     Key([mod], "r", lazy.reload_config(), desc="Reload the config"),
-    Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+    Key([mod, "Shift"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([mod, "control"], "d", lazy.run_cmd(), desc="Shutdown Qtile"),
 ]
 
@@ -204,7 +207,8 @@ screens = [
                     highlight_method='line',
                     active=theme_fg,
                     this_current_screen_border=theme_color,
-                    highlight_color=[theme_bg, theme_bg],
+                    inactive = "#707880",
+                    highlight_color=["#373b41", "#373b41"],
                 ),
                 widget.Prompt(),
                 widget.Spacer(),

@@ -5,6 +5,9 @@
 super + Return
 	alacritty
 
+super + t
+    alacritty -e tmux
+
 # Browser
 super + b
     librewolf -p Home
@@ -19,11 +22,12 @@ super + shift + s
     xfce4-screenshooter
 
 super + d
-    ~/scripts/dmenu_run -sb "$THEME_COLOR" -sf "#000000" -nb "$THEME_BG"
+    ~/scripts/dmenu_run -sb "#7aa2f7" -sf "#000000" -nb "#1a1b26"
 
 
 super + n
-    networkmanager_dmenu -l 8 -sb "$THEME_COLOR" -sf "#000000" -nb "$THEME_BG"
+    networkmanager_dmenu -l 8 -sb "#7aa2f7" -sf "#000000" -nb "#1a1b26"
+echo HI=5
 
 super + slash
     ~/scripts/menu.sh

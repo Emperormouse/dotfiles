@@ -8,8 +8,8 @@ brightnessctl -d "intel_backlight" set 20%
 
 pipewire &
 feh --bg-fill /etc/nixos/data/main-background.jpg
-#nm-applet &
-#blueman-applet &
+nm-applet &
+blueman-applet &
 /home/malcolm/scripts/low_power_notify.sh &
 echo "0" > /tmp/volume
 chmod 666 /tmp/volume

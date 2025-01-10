@@ -1,0 +1,11 @@
+gen_num=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current | awk '{print $1}')
+gen_num=$((gen_num + 1))
+
+sudo /usr/bin/env bash -c '\
+export GIT_SSH_COMMAND="ssh -i /home/malcolm/.ssh/id_ed25519";
+cd /etc/nixos;
+git add . ;
+git commit . -m Generation:'$gen_num';\
+git push ;
+nixos-rebuild switch;
+'

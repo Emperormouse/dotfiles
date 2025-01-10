@@ -1,2 +1,4 @@
 #!/bin/sh
-~/scripts/dmenu_path | dmenu "$@" | ${SHELL:-"/bin/sh"} &
+
+cmd=$(dmenu_path | dmenu "$@")
+/usr/bin/env bash -c "$cmd"

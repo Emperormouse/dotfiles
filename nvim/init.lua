@@ -35,10 +35,21 @@ cmp.setup({
   sources = {
     { name = 'nvim_lsp' },
   },
+  mapping = {
+    ['<C-j>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+    ['<C-K>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+    ['<C-[>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-]>'] = cmp.mapping.scroll_docs(4),
+    --['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-Esc>'] = cmp.mapping.close(),
+    ['<C-Space>'] = cmp.mapping.confirm({ select = true }),
+    ['<Tab>'] = cmp.mapping.confirm({ select = true }),
+  },
 })
 
 lspconfig.pyright.setup({})
 lspconfig.rust_analyzer.setup({})
+lspconfig.zls.setup({})
 
 -- Key mappings (using Lua syntax)
 -- You can create mappings using `vim.api.nvim_set_keymap` or `vim.keymap.set`
@@ -59,6 +70,7 @@ vim.keymap.set('n', '<S-w>', ':w<CR>')
 vim.keymap.set('n', '<S-q>', ':wq!<CR>')
 vim.keymap.set('n', '<S-J>', '<PageDown>')
 vim.keymap.set('n', '<S-K>', '<PageUp>')
+
 
 -- Insert mode key mappings
 vim.keymap.set('i', '<CR>', '<C-G>u<CR>')  -- Handle <CR> in insert mode (insert spaces for undo support)
