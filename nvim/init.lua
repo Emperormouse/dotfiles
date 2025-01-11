@@ -49,7 +49,10 @@ cmp.setup({
 
 lspconfig.pyright.setup({})
 lspconfig.rust_analyzer.setup({})
-lspconfig.zls.setup({})
+--lspconfig.zls.setup({})
+lspconfig.zls.setup {
+    capabilities = capabilities
+  }
 
 -- Key mappings (using Lua syntax)
 -- You can create mappings using `vim.api.nvim_set_keymap` or `vim.keymap.set`

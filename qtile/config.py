@@ -30,12 +30,14 @@ from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 from libqtile import hook
 import os
+import sys
+import tomllib as toml
 import subprocess
 
 def icon(icon: str):
     return widget.TextBox(
             text=icon, 
-            foreground=theme_color, 
+            foreground=theme_accent, 
             fontsize=18,
     )
 
@@ -50,24 +52,36 @@ mod = "mod4"
 terminal = "alacritty"
 browser = "librewolf"
 
-theme_color = os.environ.get("THEME_COLOR", "#ff0000")
-theme_bg = os.environ.get("THEME_BG", "#000000")
-theme_fg = "#c0caf5"
+import tomllib as toml
+import sys
+import os
 
+try:
+    home_dir = os.environ.get("HOME", "")
+    toml_location = f"{home_dir}/.config/theme.toml"
+    theme = toml.load(open(toml_location, "rb"))
+    colors = theme.get("colors");
+
+    theme_accent = colors.get("accent")
+    theme_bg = colors.get("background")
+    theme_fg = colors.get("foreground")
+except:
+    print("TOML error")
+    sys.exit()
 
 scripts = os.environ.get("HOME", "") + "/scripts"
 
 @hook.subscribe.startup
 def autostart():
-    script = """
-        feh --bg-fill /etc/nixos/data/main-background.jpg
+    script = f"""
+        feh --bg-fill {home_dir}/Pictures/Looks_to_the_Moon_region_screen.png
     """.splitlines()[1:]
 
     for cmd in script :
         subprocess.Popen(cmd.strip().split(' '))
 
 
-dmenu_flags = f'-sb "{theme_color}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}"'
+dmenu_flags = f'-sb "{theme_accent}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}"'
 
 keys = [
     #My Keys
@@ -123,7 +137,9 @@ keys = [
     ),
     Key([mod], "s", lazy.window.toggle_floating(), desc="Toggle floating on the focused window"),
     Key([mod], "r", lazy.reload_config(), desc="Reload the config"),
-    Key([mod, "Shift"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+    Key([mod], "q", lazy.shutdown(), desc="Log out"),
+    Key([mod, "Shift"], "q", lazy.spawn("poweroff"), desc="Shutdown"),
+    Key([mod, "Shift"], "r", lazy.spawn("reboot"), desc="Shutdown"),
     Key([mod, "control"], "d", lazy.run_cmd(), desc="Shutdown Qtile"),
 ]
 
@@ -170,7 +186,7 @@ for i in groups:
 layouts = [
     layout.Columns(
         border_focus_stack=["#d75f5f", "#8f3d3d"], 
-        border_focus = theme_color,
+        border_focus = theme_accent,
         border_normal = "#000000",
         border_width=2
     ),
@@ -206,7 +222,7 @@ screens = [
                 widget.GroupBox(
                     highlight_method='line',
                     active=theme_fg,
-                    this_current_screen_border=theme_color,
+                    this_current_screen_border=theme_accent,
                     inactive = "#707880",
                     highlight_color=["#373b41", "#373b41"],
                 ),
@@ -214,7 +230,7 @@ screens = [
                 widget.Spacer(),
                 widget.Clock(
                     format="%I:%M",
-                    foreground=theme_color
+                    foreground=theme_accent
                 ),
                 widget.Spacer(),
                 widget.Systray(),
@@ -226,7 +242,7 @@ screens = [
                 seperator(),
                 icon("󰤨"),
                 widget.Wlan(
-                    interface="wlo1",
+                    interface="wlan0",
                     format="{essid}",
                 ),
                 widget.Spacer(7),
@@ -256,7 +272,7 @@ bring_front_click = False
 floats_kept_above = True
 cursor_warp = False
 floating_layout = layout.Floating(
-    border_focus=theme_color,
+    border_focus=theme_accent,
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
