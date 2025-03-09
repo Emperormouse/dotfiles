@@ -49,6 +49,10 @@ cmp.setup({
 
 lspconfig.pyright.setup({})
 lspconfig.rust_analyzer.setup({})
+lspconfig.clangd.setup({})
+lspconfig.java_language_server.setup {
+    cmd = "java-language-server"
+}
 --lspconfig.zls.setup({})
 lspconfig.zls.setup {
     capabilities = capabilities

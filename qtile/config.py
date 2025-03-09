@@ -51,6 +51,7 @@ def seperator():
 mod = "mod4"
 terminal = "alacritty"
 browser = "librewolf"
+accent_red = "#fb7aa2"
 
 import tomllib as toml
 import sys
@@ -74,7 +75,8 @@ scripts = os.environ.get("HOME", "") + "/scripts"
 @hook.subscribe.startup
 def autostart():
     script = f"""
-        feh --bg-fill {home_dir}/Pictures/Looks_to_the_Moon_region_screen.png
+        swaybg -i {home_dir}/Pictures/Silent_Construct_region_screen.png -m fill
+        {scripts}/startup.sh
     """.splitlines()[1:]
 
     for cmd in script :
@@ -82,13 +84,17 @@ def autostart():
 
 
 dmenu_flags = f'-sb "{theme_accent}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}"'
+dmenu_flags_red = f'-sb "{accent_red}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}"'
 
 keys = [
     #My Keys
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
+    Key([mod], "t", lazy.spawn(f"{terminal} -e tmux"), desc="Launch tmux"),
     Key([mod], "b", lazy.spawn(f"{browser} -p Home"), desc="Launch browser"),
     Key([mod, "shift"], "b", lazy.spawn("firefox -p School"), desc="Launch school browser"),
     Key([mod], "d", lazy.spawn(f"dmenu_run {dmenu_flags}"), desc="Launch dmenu"),
+    Key([mod], "m", lazy.spawn(f"{scripts}/menu.sh {dmenu_flags}"), desc="Launch dmenu"),
+    Key([mod], "i", lazy.spawn(f"{scripts}/kill.sh {dmenu_flags_red}"), desc="Launch dmenu"),
 
     Key([], "XF86AudioLowerVolume", lazy.spawn(f"{scripts}/volume-change.sh - 5 && pactl set-sink-mute @DEFAULT_SINK@ false"), desc="Vol up"),
     Key([], "XF86AudioRaiseVolume", lazy.spawn(f"{scripts}/volume-change.sh + 5 && pactl set-sink-mute @DEFAULT_SINK@ false"), desc="Vol up"),

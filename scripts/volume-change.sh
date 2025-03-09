@@ -18,5 +18,5 @@ elif [[ $1 == "MUT" ]]; then
 fi
 
 v="$(tail -1 /tmp/volume | tr -d '%')"
-dunstify -h int:value:$v "Volume $v" --urgency=low -t 800 -r 1 
+notify-send -h int:value:$v "Volume $v" --urgency=low -t 800 -r 1
 
