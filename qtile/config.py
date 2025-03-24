@@ -74,8 +74,9 @@ scripts = os.environ.get("HOME", "") + "/scripts"
 
 @hook.subscribe.startup
 def autostart():
+#swaybg -i {home_dir}/Pictures/Silent_Construct_region_screen.png -m fill
     script = f"""
-        swaybg -i {home_dir}/Pictures/Silent_Construct_region_screen.png -m fill
+        feh --bg-fill {home_dir}/Pictures/Silent_Construct_region_screen.png
         {scripts}/startup.sh
     """.splitlines()[1:]
 
@@ -93,7 +94,8 @@ keys = [
     Key([mod], "b", lazy.spawn(f"{browser} -p Home"), desc="Launch browser"),
     Key([mod, "shift"], "b", lazy.spawn("firefox -p School"), desc="Launch school browser"),
     Key([mod], "d", lazy.spawn(f"dmenu_run {dmenu_flags}"), desc="Launch dmenu"),
-    Key([mod], "m", lazy.spawn(f"{scripts}/menu.sh {dmenu_flags}"), desc="Launch dmenu"),
+    Key([mod], "m", lazy.spawn(f"blueberry"), desc="Launch dmenu"),
+    Key([mod], "n", lazy.spawn(f"networkmanager_dmenu -l 16 {dmenu_flags}"), desc="Launch dmenu"),
     Key([mod], "i", lazy.spawn(f"{scripts}/kill.sh {dmenu_flags_red}"), desc="Launch dmenu"),
 
     Key([], "XF86AudioLowerVolume", lazy.spawn(f"{scripts}/volume-change.sh - 5 && pactl set-sink-mute @DEFAULT_SINK@ false"), desc="Vol up"),
@@ -121,7 +123,6 @@ keys = [
     Key([mod, "shift"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
     Key([mod, "shift"], "j", lazy.layout.grow_down(), desc="Grow window down"),
     Key([mod, "shift"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with

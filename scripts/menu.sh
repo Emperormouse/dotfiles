@@ -9,6 +9,6 @@ case $choice in
     "bluetooth")
         blueberry;;
     "network")
-        networkmanager_dmenu -l 8 "$@";;
+        networkmanager_dmenu -l 16 "$@";;
 esac
 

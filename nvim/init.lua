@@ -62,8 +62,8 @@ lspconfig.zls.setup {
 -- You can create mappings using `vim.api.nvim_set_keymap` or `vim.keymap.set`
 
 -- Normal mode key mappings
-vim.keymap.set('n', '<C-c>', '0i#<esc>j')
-vim.keymap.set('n', '<C-x>', '0xj')
+vim.keymap.set('n', '<C-c>', '0i//<esc>j')
+vim.keymap.set('n', '<C-x>', '0xxj')
 vim.keymap.set('n', 'C', 'J')
 vim.keymap.set('n', 'D', '"1dd')
 vim.keymap.set('n', 'dd', '"0dd')
@@ -77,6 +77,7 @@ vim.keymap.set('n', '<S-w>', ':w<CR>')
 vim.keymap.set('n', '<S-q>', ':wq!<CR>')
 vim.keymap.set('n', '<S-J>', '<PageDown>')
 vim.keymap.set('n', '<S-K>', '<PageUp>')
+vim.keymap.set('n', 'z', '.jj')
 
 
 -- Insert mode key mappings
