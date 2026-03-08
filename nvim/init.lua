@@ -77,8 +77,6 @@ vim.keymap.set('n', '<S-w>', ':w<CR>')
 vim.keymap.set('n', '<S-q>', ':wq!<CR>')
 vim.keymap.set('n', '<S-J>', '<PageDown>')
 vim.keymap.set('n', '<S-K>', '<PageUp>')
-vim.keymap.set('n', 'z', '.jj')
-
 
 -- Insert mode key mappings
 vim.keymap.set('i', '<CR>', '<C-G>u<CR>')  -- Handle <CR> in insert mode (insert spaces for undo support)

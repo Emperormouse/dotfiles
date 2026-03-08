@@ -1,5 +1,6 @@
 # Copyright (c) 2010 Aldo Cortesi
-# Copyright (c) 2010, 2014 dequis Copyright (c) 2012 Randall Ma
+# Copyright (c) 2010, 2014 dequis
+# Copyright (c) 2012 Randall Ma
 # Copyright (c) 2012-2014 Tycho Andersen
 # Copyright (c) 2012 Craig Barnes
 # Copyright (c) 2013 horsik
@@ -23,92 +24,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os
+
+import libqtile.resources
 from libqtile import bar, layout, qtile, widget
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
-from libqtile import hook
-import os
-import sys
-import tomllib as toml
-import subprocess
-import copy
-
-def icon(icon: str):
-    return widget.TextBox(
-            text=icon, 
-            foreground=theme_accent, 
-            fontsize=18,
-    )
-
-def seperator():
-    return widget.TextBox(
-            text="|", padding=8, 
-            foreground="#676d75", 
-            fontsize=17,
-    )
 
 mod = "mod4"
-terminal = "alacritty"
-browser = "librewolf"
-graphics_server = "wayland" if os.environ.get("WAYLAND_DISPLAY") else "x11"
-
-accent_red = "#fb7aa2"
-accent_blue = "#7aa2f7"
-accent_orange = "#f76e5c"
-
-theme_accent = accent_blue
-theme_bg = "#1a1b26"
-theme_fg = "#c0caf5"
-font = "GohuFont14NerdFontMono"
-
-home_dir = os.environ.get("HOME", "")
-scripts = home_dir + "/scripts"
-
-@hook.subscribe.startup_once
-def autostart():
-    script = f"{home_dir}/.config/qtile/autostart.sh"
-    _ = subprocess.call(script, shell=True);
-
-
-if graphics_server == "x11":
-    dmenu = "dmenu"
-    dmenu_run = "dmenu_run"
-    dmenu_nm = "networkmanager_dmenu -l 16"
-    dmenu_flags = f'-sb "{theme_accent}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}" -fn "{font}"'
-    dmenu_flags_red = f'-sb "{accent_red}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}" -fn "{font}"'
-else:
-    dmenu = "wmenu"
-    dmenu_run = "wmenu-run"
-    dmenu_nm = "networkmanager_wmenu -l 10"
-    dmenu_flags = f'-S "{theme_accent}" -s "#000000" -N "{theme_bg}" -n "{theme_fg}" -M "{theme_accent}" -m "#000000"'
-    dmenu_flags_red = f'-S "{accent_red}" -s "#000000" -N "{theme_bg}" -n "{theme_fg}"'
-
-def alacritty(args, server=graphics_server):
-    if server == "x11":
-        return f"env -u WAYLAND_DISPLAY bash -c 'alacritty --config-file ~/.config/alacritty/alacritty-x11.toml {args} &'"
-    else:
-        return f"bash -c 'alacritty {args}'"
+terminal = guess_terminal()
 
 keys = [
-    #My Keys
-    Key([mod], "Return", lazy.spawn(alacritty("")), desc="Launch terminal"),
-    Key([mod], "t", lazy.spawn(alacritty("-e tmux")), desc="Launch tmux"),
-    Key([mod], "b", lazy.spawn(f"{browser} -p Home"), desc="Launch browser"),
-    Key([mod], "p", lazy.spawn(alacritty("-e python3")), desc="Launch browser"),
-    Key([mod, "shift"], "b", lazy.spawn("firefox -p School"), desc="Launch school browser"),
-    Key([mod], "d", lazy.spawn(f"{dmenu_run} {dmenu_flags}"), desc="Launch dmenu"),
-    Key([mod], "m", lazy.spawn(f"blueberry"), desc="Launch dmenu"),
-    Key([mod, "shift"], "s", lazy.spawn(f"xfce4-screenshooter -r"), desc="Launch dmenu"),
-    Key([mod], "n", lazy.spawn(f"{dmenu_nm} {dmenu_flags}"), desc="Launch dmenu"),
-    Key([mod], "i", lazy.spawn(f"{scripts}/kill.sh {dmenu_flags_red}"), desc="Launch dmenu"),
-    Key([mod], "c", lazy.spawn(alacritty("--working-directory=/home/malcolm/code/rust/consoleGL", "x11")), desc="Code"),
-
-    Key([], "XF86AudioLowerVolume", lazy.spawn(f"{scripts}/volume-change.sh - 5 && pactl set-sink-mute @DEFAULT_SINK@ false"), desc="Vol up"),
-    Key([], "XF86AudioRaiseVolume", lazy.spawn(f"{scripts}/volume-change.sh + 5 && pactl set-sink-mute @DEFAULT_SINK@ false"), desc="Vol up"),
-    Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl -d 'intel_backlight' set 5%+", ), desc="Vol up"),
-    Key([], "XF86MonBrightnessDOwn", lazy.spawn("brightnessctl -d 'intel_backlight' set 5%-"), desc="Vol up"),
-
     # A list of available commands that can be bound to keys can be found
     # at https://docs.qtile.org/en/latest/manual/config/lazy.html
     # Switch between windows
@@ -119,16 +46,17 @@ keys = [
     Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
-    Key([mod, "control"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
-    Key([mod, "control"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
-    Key([mod, "control"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
-    Key([mod, "control"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+    Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
+    Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
+    Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
     # Grow windows. If current window is on the edge of screen and direction
     # will be to screen edge - window would shrink.
-    Key([mod, "shift"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
-    Key([mod, "shift"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
-    Key([mod, "shift"], "j", lazy.layout.grow_down(), desc="Grow window down"),
-    Key([mod, "shift"], "k", lazy.layout.grow_up(), desc="Grow window up"),
+    Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
+    Key([mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
+    Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
+    Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
+    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with
@@ -139,21 +67,20 @@ keys = [
         lazy.layout.toggle_split(),
         desc="Toggle between split and unsplit sides of stack",
     ),
+    Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
     # Toggle between different layouts as defined below
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
-    Key([mod], "x", lazy.window.kill(), desc="Kill focused window"),
+    Key([mod], "w", lazy.window.kill(), desc="Kill focused window"),
     Key(
         [mod],
         "f",
         lazy.window.toggle_fullscreen(),
         desc="Toggle fullscreen on the focused window",
     ),
-    Key([mod], "s", lazy.window.toggle_floating(), desc="Toggle floating on the focused window"),
-    Key([mod], "r", lazy.reload_config(), desc="Reload the config"),
-    Key([mod], "q", lazy.shutdown(), desc="Log out"),
-    Key([mod, "Shift"], "q", lazy.spawn("poweroff"), desc="Shutdown"),
-    Key([mod, "Shift"], "r", lazy.spawn("reboot"), desc="Shutdown"),
-    Key([mod, "control"], "d", lazy.run_cmd(), desc="Shutdown Qtile"),
+    Key([mod], "t", lazy.window.toggle_floating(), desc="Toggle floating on the focused window"),
+    Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
+    Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+    Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
 ]
 
 # Add key bindings to switch VTs in Wayland.
@@ -180,14 +107,14 @@ for i in groups:
                 [mod],
                 i.name,
                 lazy.group[i.name].toscreen(),
-                desc="Switch to group {}".format(i.name),
+                desc=f"Switch to group {i.name}",
             ),
             # mod + shift + group number = switch to & move focused window to group
             Key(
                 [mod, "shift"],
                 i.name,
                 lazy.window.togroup(i.name, switch_group=True),
-                desc="Switch to & move focused window to group {}".format(i.name),
+                desc=f"Switch to & move focused window to group {i.name}",
             ),
             # Or, use below if you prefer not to switch to that group.
             # # mod + shift + group number = move focused window to group
@@ -197,12 +124,7 @@ for i in groups:
     )
 
 layouts = [
-    layout.Columns(
-        border_focus_stack=["#d75f5f", "#8f3d3d"], 
-        border_focus = theme_accent,
-        border_normal = "#000000",
-        border_width=1
-    ),
+    layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
     layout.Max(),
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
@@ -218,66 +140,48 @@ layouts = [
 ]
 
 widget_defaults = dict(
-    # font="FiraCodeNerdFontMono",
-    font=font,
-    background=theme_bg,  # Background color (dark gray)
-    foreground=theme_fg,
-    fontsize=14,
-    padding=5,
-
+    font="sans",
+    fontsize=12,
+    padding=3,
 )
 extension_defaults = widget_defaults.copy()
 
-#BAR
-def my_screen():
-     return Screen(
-        top=bar.Bar(
-            [
-                widget.GroupBox(
-                    active=theme_fg,
-                    this_current_screen_border=theme_accent,
-                    orther_current_screen_border=theme_accent,
-                    orther_screen_border=theme_accent,
-                    inactive = "#707880",
-                    highlight_method='line',
-                    highlight_color=[theme_accent, theme_accent],
-                    block_highlight_text_color = "#000000"
-                ),
-                widget.Prompt(),
-                widget.Spacer(),
-                widget.Clock(
-                    format="%I:%M",
-                    background=theme_accent,
-                    foreground="#000000",
-                ),
-                widget.Spacer(),
-                widget.Systray(),
-                seperator(),
-                icon("󰁹"),
-                widget.Battery(
-                    format="{percent:2.0%}",
-                    low_foreground=accent_red,
-                ),
-                seperator(),
-                icon("󰤨"),
-                widget.Wlan(
-                    interface="wlan0",
-                    format="{essid}",
-                ),
-                widget.Spacer(7),
-            ],
-            28,
-            border_width=[0, 0, 1, 0],  # Draw top and bottom borders
-            border_color=[theme_accent, "000000", theme_accent, "000000"]  # Borders are magenta
-        ),
-    )
-
+logo = os.path.join(os.path.dirname(libqtile.resources.__file__), "logo.png")
 screens = [
-    my_screen(),
-    my_screen(),
+    Screen(
+        bottom=bar.Bar(
+            [
+                widget.CurrentLayout(),
+                widget.GroupBox(),
+                widget.Prompt(),
+                widget.WindowName(),
+                widget.Chord(
+                    chords_colors={
+                        "launch": ("#ff0000", "#ffffff"),
+                    },
+                    name_transform=lambda name: name.upper(),
+                ),
+                widget.TextBox("default config", name="default"),
+                widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+                # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
+                # widget.StatusNotifier(),
+                widget.Systray(),
+                widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
+                widget.QuickExit(),
+            ],
+            24,
+            # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
+            # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
+        ),
+        background="#000000",
+        wallpaper=logo,
+        wallpaper_mode="center",
+        # You can uncomment this variable if you see that on X11 floating resize/moving is laggy
+        # By default we handle these events delayed to already improve performance, however your system might still be struggling
+        # This variable is set to None (no cap) by default, but you can set it to 60 to indicate that you limit it to 60 events per second
+        # x11_drag_polling_rate = 60,
+    ),
 ]
-
-
 
 # Drag floating layouts.
 mouse = [
@@ -293,7 +197,6 @@ bring_front_click = False
 floats_kept_above = True
 cursor_warp = False
 floating_layout = layout.Floating(
-    border_focus=theme_accent,
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
@@ -301,14 +204,13 @@ floating_layout = layout.Floating(
         Match(wm_class="makebranch"),  # gitk
         Match(wm_class="maketag"),  # gitk
         Match(wm_class="ssh-askpass"),  # ssh-askpass
-        Match(wm_class="blueberry.py"),
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
-        Match(wm_class="firefox"),
     ]
 )
 auto_fullscreen = True
 focus_on_window_activation = "smart"
+focus_previous_on_window_remove = False
 reconfigure_screens = True
 
 # If things like steam games want to auto-minimize themselves when losing

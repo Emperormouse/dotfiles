@@ -32,7 +32,6 @@ import os
 import sys
 import tomllib as toml
 import subprocess
-import copy
 
 def icon(icon: str):
     return widget.TextBox(
@@ -51,16 +50,13 @@ def seperator():
 mod = "mod4"
 terminal = "alacritty"
 browser = "librewolf"
+accent_red = "#fb7aa2"
 graphics_server = "wayland" if os.environ.get("WAYLAND_DISPLAY") else "x11"
 
-accent_red = "#fb7aa2"
-accent_blue = "#7aa2f7"
-accent_orange = "#f76e5c"
-
-theme_accent = accent_blue
+theme_accent = "#7aa2f7"
+# theme_accent = accent_red
 theme_bg = "#1a1b26"
 theme_fg = "#c0caf5"
-font = "GohuFont14NerdFontMono"
 
 home_dir = os.environ.get("HOME", "")
 scripts = home_dir + "/scripts"
@@ -75,8 +71,8 @@ if graphics_server == "x11":
     dmenu = "dmenu"
     dmenu_run = "dmenu_run"
     dmenu_nm = "networkmanager_dmenu -l 16"
-    dmenu_flags = f'-sb "{theme_accent}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}" -fn "{font}"'
-    dmenu_flags_red = f'-sb "{accent_red}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}" -fn "{font}"'
+    dmenu_flags = f'-sb "{theme_accent}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}"'
+    dmenu_flags_red = f'-sb "{accent_red}" -sf "#000000" -nb "{theme_bg}" -nf "{theme_fg}"'
 else:
     dmenu = "wmenu"
     dmenu_run = "wmenu-run"
@@ -99,7 +95,6 @@ keys = [
     Key([mod, "shift"], "b", lazy.spawn("firefox -p School"), desc="Launch school browser"),
     Key([mod], "d", lazy.spawn(f"{dmenu_run} {dmenu_flags}"), desc="Launch dmenu"),
     Key([mod], "m", lazy.spawn(f"blueberry"), desc="Launch dmenu"),
-    Key([mod, "shift"], "s", lazy.spawn(f"xfce4-screenshooter -r"), desc="Launch dmenu"),
     Key([mod], "n", lazy.spawn(f"{dmenu_nm} {dmenu_flags}"), desc="Launch dmenu"),
     Key([mod], "i", lazy.spawn(f"{scripts}/kill.sh {dmenu_flags_red}"), desc="Launch dmenu"),
     Key([mod], "c", lazy.spawn(alacritty("--working-directory=/home/malcolm/code/rust/consoleGL", "x11")), desc="Code"),
@@ -201,7 +196,7 @@ layouts = [
         border_focus_stack=["#d75f5f", "#8f3d3d"], 
         border_focus = theme_accent,
         border_normal = "#000000",
-        border_width=1
+        border_width=2
     ),
     layout.Max(),
     # Try more layouts by unleashing below layouts.
@@ -218,37 +213,32 @@ layouts = [
 ]
 
 widget_defaults = dict(
-    # font="FiraCodeNerdFontMono",
-    font=font,
+    font="FiraCodeNerdFontMono",
     background=theme_bg,  # Background color (dark gray)
     foreground=theme_fg,
-    fontsize=14,
+    fontsize=16,
     padding=5,
 
 )
 extension_defaults = widget_defaults.copy()
 
 #BAR
-def my_screen():
-     return Screen(
+screens = [
+    Screen(
         top=bar.Bar(
             [
                 widget.GroupBox(
+                    highlight_method='line',
                     active=theme_fg,
                     this_current_screen_border=theme_accent,
-                    orther_current_screen_border=theme_accent,
-                    orther_screen_border=theme_accent,
                     inactive = "#707880",
-                    highlight_method='line',
-                    highlight_color=[theme_accent, theme_accent],
-                    block_highlight_text_color = "#000000"
+                    highlight_color=["#373b41", "#373b41"],
                 ),
                 widget.Prompt(),
                 widget.Spacer(),
                 widget.Clock(
                     format="%I:%M",
-                    background=theme_accent,
-                    foreground="#000000",
+                    foreground=theme_accent
                 ),
                 widget.Spacer(),
                 widget.Systray(),
@@ -256,7 +246,6 @@ def my_screen():
                 icon("󰁹"),
                 widget.Battery(
                     format="{percent:2.0%}",
-                    low_foreground=accent_red,
                 ),
                 seperator(),
                 icon("󰤨"),
@@ -267,17 +256,15 @@ def my_screen():
                 widget.Spacer(7),
             ],
             28,
-            border_width=[0, 0, 1, 0],  # Draw top and bottom borders
-            border_color=[theme_accent, "000000", theme_accent, "000000"]  # Borders are magenta
+            # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
+            # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
         ),
-    )
-
-screens = [
-    my_screen(),
-    my_screen(),
+        # You can uncomment this variable if you see that on X11 floating resize/moving is laggy
+        # By default we handle these events delayed to already improve performance, however your system might still be struggling
+        # This variable is set to None (no cap) by default, but you can set it to 60 to indicate that you limit it to 60 events per second
+        # x11_drag_polling_rate = 60,
+    ),
 ]
-
-
 
 # Drag floating layouts.
 mouse = [
